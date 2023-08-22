@@ -70,6 +70,13 @@ Is automatically turned into a query that looks like this:
 SELECT * FROM employees WHERE UPPER(name) = UPPER('jessica');
 ```
 
+## 💡 Related Libraries
+
+- [deepgorm](https://github.com/survivorbat/gorm-deep-filtering) turns nested maps in WHERE-calls into subqueries
+- [gormqonvert](https://github.com/survivorbat/gorm-query-convert) turns WHERE-calls into different queries if certain tokens were found
+- [gormlike](https://github.com/survivorbat/gorm-like) turns WHERE-calls into LIkE queries if certain tokens were found
+- [gormtestutil](https://github.com/ing-bank/gormtestutil) provides easy utility methods for unit-testing with gorm
+
 ## ⬇️ Installation
 
 `go get github.com/survivorbat/gorm-case`
