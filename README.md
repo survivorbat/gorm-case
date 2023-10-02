@@ -92,7 +92,7 @@ import (
 
 func main() {
 	db, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	db.Use(gormcase.New("🍌"))
+	db.Use(gormcase.New())
 }
 
 ```
