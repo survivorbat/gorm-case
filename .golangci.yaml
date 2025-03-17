@@ -1,0 +1,59 @@
+output:
+  formats:
+    - format: colored-tab
+
+issues:
+  exclude-rules:
+    - path: .+_test\.go
+      linters:
+        - goconst
+        - nilnil
+        - err113
+        - ireturn
+        - bodyclose
+
+linters-settings:
+  nlreturn:
+    # Allow 2 lines max to have a return statement without a new line before it
+    block-size: 3
+
+  gocritic:
+    disabled-checks:
+      - "paramTypeCombine"
+      - "unnamedResult"
+    enabled-tags:
+      - "performance"
+      - "style"
+      - "diagnostic"
+
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+
+linters:
+  enable-all: true
+  disable:
+    - gci
+    - gochecknoglobals
+    - depguard
+    - exhaustruct
+    - exhaustive
+    - lll
+    - wsl
+    - wrapcheck
+    - varnamelen
+    - testpackage
+    - funlen
+    - godox
+    - dupl
+    - dupword
+    - exptostd
+    - godot
+    - musttag
+    - forcetypeassert
+    - protogetter
+    - nlreturn
+    - tagliatelle
+    - tenv # deprecated (since v1.64.0) due to: Duplicate feature in another linter. Replaced by usetesting
+

@@ -1,18 +1,19 @@
 package gormcase
 
 import (
-	"github.com/google/uuid"
+	"testing"
+
 	"github.com/ing-bank/gormtestutil"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
-	"testing"
 )
 
 func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 	t.Parallel()
 
 	type ObjectA struct {
-		ID    uuid.UUID
+		ID    uint
 		Name  string
 		Age   int
 		Other string
@@ -36,8 +37,8 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 			filter: map[string]any{
 				"name": "jessica",
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 46}, {Name: "amy", Age: 35}},
-			expected: []ObjectA{{Name: "jessica", Age: 46}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 46}, {ID: 2, Name: "amy", Age: 35}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 46}},
 			query:    defaultQuery,
 		},
 		"more complex where query": {
@@ -45,16 +46,16 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 				"name": "jessica",
 				"age":  53,
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53}, {Name: "jessica", Age: 20}},
-			expected: []ObjectA{{Name: "jessica", Age: 53}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "jessica", Age: 20}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53}},
 			query:    defaultQuery,
 		},
 		"multi-value where query": {
 			filter: map[string]any{
 				"name": []string{"jessica", "amy"},
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}},
-			expected: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}},
 			query:    defaultQuery,
 		},
 		"more complex multi-value where query": {
@@ -62,8 +63,8 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 				"name": []string{"jessica", "amy"},
 				"age":  []int{53, 20},
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}},
-			expected: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}},
 			query:    defaultQuery,
 		},
 
@@ -72,8 +73,8 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 			filter: map[string]any{
 				"name": "JESSICA",
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53}},
-			expected: []ObjectA{{Name: "jessica", Age: 53}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53}},
 			query:    defaultQuery,
 		},
 		"more complex insensitivity query": {
@@ -81,16 +82,16 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 				"name": "JESSICA",
 				"age":  20,
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 20}},
-			expected: []ObjectA{{Name: "jessica", Age: 20}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 20}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 20}},
 			query:    defaultQuery,
 		},
 		"multi-value, all insensitivity queries": {
 			filter: map[string]any{
 				"name": []string{"JeSSICA", "AmY"},
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}, {Name: "John", Age: 25}},
-			expected: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}, {ID: 3, Name: "John", Age: 25}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}},
 			query:    defaultQuery,
 		},
 		"more complex multi-value, all insensitivity queries": {
@@ -98,16 +99,16 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 				"name":  []string{"JESSICA", "AMY"},
 				"other": []string{"AAAooo", "AAAooo"},
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53, Other: "aaaooo"}, {Name: "amy", Age: 20, Other: "aaaooo"}, {Name: "John", Age: 25, Other: "aaaooo"}},
-			expected: []ObjectA{{Name: "jessica", Age: 53, Other: "aaaooo"}, {Name: "amy", Age: 20, Other: "aaaooo"}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53, Other: "aaaooo"}, {ID: 2, Name: "amy", Age: 20, Other: "aaaooo"}, {ID: 3, Name: "John", Age: 25, Other: "aaaooo"}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53, Other: "aaaooo"}, {ID: 2, Name: "amy", Age: 20, Other: "aaaooo"}, {ID: 3, Name: "John", Age: 25, Other: "aaaooo"}},
 			query:    defaultQuery,
 		},
 		"multi-value, some insensitivity queries": {
 			filter: map[string]any{
 				"name": []string{"JESSICA", "JOHN"},
 			},
-			existing: []ObjectA{{Name: "JESSICA", Age: 53}, {Name: "amy", Age: 20}, {Name: "John", Age: 25}},
-			expected: []ObjectA{{Name: "JESSICA", Age: 53}, {Name: "John", Age: 25}},
+			existing: []ObjectA{{ID: 1, Name: "JESSICA", Age: 53}, {ID: 2, Name: "amy", Age: 20}, {ID: 3, Name: "John", Age: 25}},
+			expected: []ObjectA{{ID: 1, Name: "JESSICA", Age: 53}, {ID: 3, Name: "John", Age: 25}},
 			query:    defaultQuery,
 		},
 		"more complex multi-value, some insensitivity queries": {
@@ -115,8 +116,8 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 				"name":  []string{"jessica", "JOHN"},
 				"other": []string{"AAB", "Bb"},
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53, Other: "aab"}, {Name: "amy", Age: 20}, {Name: "John", Age: 25, Other: "bb"}},
-			expected: []ObjectA{{Name: "jessica", Age: 53, Other: "aab"}, {Name: "John", Age: 25, Other: "bb"}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53, Other: "aab"}, {ID: 2, Name: "amy", Age: 20}, {ID: 3, Name: "John", Age: 25, Other: "bb"}},
+			expected: []ObjectA{{ID: 1, Name: "jessica", Age: 53, Other: "aab"}, {ID: 3, Name: "John", Age: 25, Other: "bb"}},
 			query:    defaultQuery,
 		},
 		"explicitly disable liking in query": {
@@ -127,24 +128,20 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 			query: func(db *gorm.DB) *gorm.DB {
 				return db.Set(tagName, false)
 			},
-			existing: []ObjectA{{Name: "jessica", Age: 53}, {Name: "amy", Age: 20}},
+			existing: []ObjectA{{ID: 1, Name: "jessica", Age: 53}, {ID: 2, Name: "amy", Age: 20}},
 			expected: []ObjectA{},
 		},
 	}
 
 	for name, testData := range tests {
-		testData := testData
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
 			db := gormtestutil.NewMemoryDatabase(t, gormtestutil.WithName(t.Name()))
-			_ = db.AutoMigrate(&ObjectA{})
+			require.NoError(t, db.AutoMigrate(&ObjectA{}))
 			plugin := New()
 
-			if err := db.CreateInBatches(testData.existing, 10).Error; err != nil {
-				t.Error(err)
-				t.FailNow()
-			}
+			require.NoError(t, db.CreateInBatches(testData.existing, 10).Error)
 
 			db = testData.query(db)
 
@@ -152,11 +149,11 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 			err := db.Use(plugin)
 
 			// Assert
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			var actual []ObjectA
 			err = db.Where(testData.filter).Find(&actual).Error
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, testData.expected, actual)
 		})
@@ -207,7 +204,6 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithConditionalTa
 	}
 
 	for name, testData := range tests {
-		testData := testData
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
@@ -224,11 +220,11 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithConditionalTa
 			err := db.Use(plugin)
 
 			// Assert
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			var actual []ObjectB
 			err = db.Where(testData.filter).Find(&actual).Error
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, testData.expected, actual)
 		})
@@ -292,7 +288,6 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithSetting(t *te
 	}
 
 	for name, testData := range tests {
-		testData := testData
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
@@ -311,11 +306,11 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithSetting(t *te
 			err := db.Use(plugin)
 
 			// Assert
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			var actual []ObjectB
 			err = db.Where(testData.filter).Find(&actual).Error
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, testData.expected, actual)
 		})

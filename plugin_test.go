@@ -1,9 +1,11 @@
 package gormcase
 
 import (
+	"testing"
+
 	"github.com/ing-bank/gormtestutil"
 	"github.com/stretchr/testify/assert"
-	"testing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDeepGorm_Name_ReturnsExpectedName(t *testing.T) {
@@ -28,6 +30,6 @@ func TestDeepGorm_Initialize_RegistersCallback(t *testing.T) {
 	err := plugin.Initialize(db)
 
 	// Assert
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, db.Callback().Query().Get("gormcase:query"))
 }
