@@ -134,7 +134,6 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 	}
 
 	for name, testData := range tests {
-		testData := testData
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
@@ -150,11 +149,11 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectly(t *testing.T) {
 			err := db.Use(plugin)
 
 			// Assert
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			var actual []ObjectA
 			err = db.Where(testData.filter).Find(&actual).Error
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, testData.expected, actual)
 		})
@@ -205,7 +204,6 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithConditionalTa
 	}
 
 	for name, testData := range tests {
-		testData := testData
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
@@ -222,11 +220,11 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithConditionalTa
 			err := db.Use(plugin)
 
 			// Assert
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			var actual []ObjectB
 			err = db.Where(testData.filter).Find(&actual).Error
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, testData.expected, actual)
 		})
@@ -290,7 +288,6 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithSetting(t *te
 	}
 
 	for name, testData := range tests {
-		testData := testData
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
@@ -309,11 +306,11 @@ func TestDeepGorm_Initialize_TriggersCaseInsensitivityCorrectlyWithSetting(t *te
 			err := db.Use(plugin)
 
 			// Assert
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			var actual []ObjectB
 			err = db.Where(testData.filter).Find(&actual).Error
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, testData.expected, actual)
 		})

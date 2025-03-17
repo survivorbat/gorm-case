@@ -11,4 +11,5 @@ func ExampleNew() {
 	_ = db.Use(New())
 	_ = db.Use(New(TaggedOnly()))
 	_ = db.Use(New(SettingOnly()))
+	// Output:
 }

@@ -27,7 +27,7 @@ func TaggedOnly() Option {
 }
 
 // New creates a new instance of the plugin that can be registered in gorm.
-func New(opts ...Option) gorm.Plugin {
+func New(opts ...Option) gorm.Plugin { //nolint:ireturn // accepted for enabling linter
 	plugin := &gormCase{}
 
 	for _, opt := range opts {

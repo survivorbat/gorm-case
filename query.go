@@ -35,7 +35,7 @@ func (d *gormCase) queryCallback(db *gorm.DB) {
 	}
 }
 
-func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.Expression {
+func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.Expression { //nolint:gocognit,cyclop,ireturn // accepted for enabling linter
 	switch cond := cond.(type) {
 	case clause.Eq:
 		if d.conditionalTag {
@@ -45,10 +45,7 @@ func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.
 			}
 
 			table := db.Statement.Schema.Table + "."
-			if strings.HasPrefix(columnName, table) {
-				columnName = strings.TrimPrefix(columnName, table)
-			}
-
+			columnName = strings.TrimPrefix(columnName, table)
 			value := db.Statement.Schema.FieldsByDBName[columnName].Tag.Get(tagName)
 
 			// Ignore if there's no valid tag value
@@ -73,10 +70,7 @@ func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.
 			}
 
 			table := db.Statement.Schema.Table + "."
-			if strings.HasPrefix(columnName, table) {
-				columnName = strings.TrimPrefix(columnName, table)
-			}
-
+			columnName = strings.TrimPrefix(columnName, table)
 			value := db.Statement.Schema.FieldsByDBName[columnName].Tag.Get(tagName)
 
 			// Ignore if there's no valid tag value

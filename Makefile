@@ -12,4 +12,13 @@ test: fmt ## Run unit tests, alias: t
 
 fmt: ## Format go code
 	@go mod tidy
-	@go fmt ./...
+	@gofumpt -l -w .
+	@golangci-lint run --fix
+
+lint:
+	golangci-lint run --config .golangci.yaml ./...
+
+tools: ## Install extra tools for development
+	go install mvdan.cc/gofumpt@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
