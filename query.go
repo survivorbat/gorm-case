@@ -38,14 +38,14 @@ func (d *gormCase) queryCallback(db *gorm.DB) {
 func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.Expression { //nolint:gocognit,cyclop,ireturn // accepted for enabling linter
 	switch cond := cond.(type) {
 	case clause.Eq:
-		if d.conditionalTag {
-			columnName, ok := cond.Column.(string)
-			if !ok {
-				return nil
-			}
+		column, ok := cond.Column.(clause.Column)
+		if !ok {
+			return nil
+		}
 
+		if d.conditionalTag {
 			table := db.Statement.Schema.Table + "."
-			columnName = strings.TrimPrefix(columnName, table)
+			columnName := strings.TrimPrefix(column.Name, table)
 			value := db.Statement.Schema.FieldsByDBName[columnName].Tag.Get(tagName)
 
 			// Ignore if there's no valid tag value
@@ -59,18 +59,17 @@ func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.
 			return nil
 		}
 
-		condition := fmt.Sprintf("UPPER(%s) = UPPER(?)", cond.Column)
+		condition := fmt.Sprintf("UPPER(%s) = UPPER(?)", column.Name)
 
 		return db.Session(&gorm.Session{NewDB: true}).Where(condition, value).Statement.Clauses["WHERE"].Expression
 	case clause.IN:
+		column, ok := cond.Column.(clause.Column)
+		if !ok {
+			return nil
+		}
 		if d.conditionalTag {
-			columnName, ok := cond.Column.(string)
-			if !ok {
-				return nil
-			}
-
 			table := db.Statement.Schema.Table + "."
-			columnName = strings.TrimPrefix(columnName, table)
+			columnName := strings.TrimPrefix(column.Name, table)
 			value := db.Statement.Schema.FieldsByDBName[columnName].Tag.Get(tagName)
 
 			// Ignore if there's no valid tag value
@@ -92,7 +91,7 @@ func (d *gormCase) handleExpression(db *gorm.DB, cond clause.Expression) clause.
 
 			caseCounter++
 
-			condition := fmt.Sprintf("UPPER(%s) = UPPER(?)", cond.Column)
+			condition := fmt.Sprintf("UPPER(%s) = UPPER(?)", column.Name)
 
 			if useOr {
 				query = query.Or(condition, value)
